@@ -11,9 +11,9 @@ def img2data(path, width=100):
     rawImgs = []   #### una lista con el array que representa cada imágen
     labels = [] ### el label de cada imágen
     
-    list_labels = [path+f for f in listdir(path)] ### crea una lista de los archivos en la ruta (Normal /Pneumonia)
+    list_labels = [path+f for f in listdir(path)] ### crea una lista de los archivos en la ruta
 
-    for imagePath in ( list_labels): ### recorre cada carpeta de la ruta ingresada
+    for imagePath in (list_labels): ### recorre cada carpeta de la ruta ingresada
         
         files_list=listdir(imagePath) ### crea una lista con todos los archivos
         for item in tqdm(files_list): ### le pone contador a la lista: tqdm
@@ -28,8 +28,8 @@ def img2data(path, width=100):
                     labels.append([0])
                 if l == 'VeryMildDemented':  ### verificar en qué carpeta está para asignar el label
                     labels.append([1])
-                if l == 'MildDemented':  ### verificar en qué carpeta está para asignar el label
+                if l == 'MildDemented':
                     labels.append([2])
-                elif l == 'ModerateDemanted':
+                elif l == 'ModerateDemented':
                     labels.append([3])
     return rawImgs, labels

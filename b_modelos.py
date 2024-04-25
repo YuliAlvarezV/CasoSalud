@@ -2,15 +2,91 @@ import numpy as np
 import joblib ### para cargar array
 
 ########Paquetes para NN #########
-import tensorflow as tf
 from sklearn import metrics ### para analizar modelo
 from sklearn.ensemble import RandomForestClassifier  ### para analizar modelo
 import pandas as pd
-
-from sklearn import tree
-
+import tensorflow as tf
 
 import cv2 ### para leer imagenes jpeg
-### pip install opencv-python
 
 from matplotlib import pyplot as plt #
+from sklearn.preprocessing import label_binarize
+
+
+### cargar bases_preprocesadas ####
+
+x_train = joblib.load('salidas\\x_train.pkl')
+y_train = joblib.load('salidas\\y_train.pkl')
+x_test = joblib.load('salidas\\x_test.pkl')
+y_test = joblib.load('salidas\\y_test.pkl')
+
+#### Escalar ######################
+x_train=x_train.astype('float32') ## para poder escalarlo
+x_test=x_test.astype('float32') ## para poder escalarlo
+x_train /=255 ### escalaro para que quede entre 0 y 1
+x_test /=255
+
+###### verificar tamaños
+
+x_train.shape
+x_test.shape
+
+np.product(x_train[1].shape) ## cantidad de variables por imagen
+
+np.unique(y_train, return_counts=True)
+np.unique(y_test, return_counts=True)
+
+##### convertir a 1 d array ############
+x_train2=x_train.reshape(5121,30000)
+x_test2=x_test.reshape(1279, 30000)
+x_train2.shape
+x_test2.shape
+
+############################################################
+################ Probar modelos de tradicionales#########
+############################################################
+
+#################### RandomForest ##########
+
+rf=RandomForestClassifier()
+rf.fit(x_train2, y_train)
+
+pred_train=rf.predict(x_train2)
+print(metrics.classification_report(y_train, pred_train))
+pred_test=rf.predict(x_test2)
+print(metrics.classification_report(y_test, pred_test))
+
+# Convertir las etiquetas de clase en un formato binario
+y_score_binary = label_binarize(pred_train, classes=[0, 1, 2, 3]) 
+metrics.roc_auc_score(y_train, y_score_binary, average='macro', multi_class='ovr')
+y_score_binaryt = label_binarize(pred_test, classes=[0, 1, 2, 3]) 
+metrics.roc_auc_score(y_test, y_score_binaryt, average='macro', multi_class='ovr')
+
+############################################################
+################ Probar modelos de redes neuronales #########
+############################################################
+
+fc_model=tf.keras.models.Sequential([
+    tf.keras.layers.Flatten(input_shape=x_train.shape[1:]),
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dense(1, activation='sigmoid')
+])
+
+##### configura el optimizador y la función para optimizar ##############
+
+fc_model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy','AUC', 'Recall', 'Precision', 'f1_score'])
+
+#####Entrenar el modelo usando el optimizador y arquitectura definidas #########
+
+fc_model.fit(x_train, y_train, batch_size=100, epochs=10, validation_data=(x_test, y_test))
+
+#########Evaluar el modelo ####################
+
+test_results = fc_model.evaluate(x_test, y_test, verbose=2)
+
+# Mostrar los resultados
+print("Test AUC:", test_results[2])
+print("Test Recall:", test_results[3])
+print("Test Precision:", test_results[4])
+print("Test F1-score:", test_results[5])

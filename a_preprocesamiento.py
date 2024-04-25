@@ -8,8 +8,8 @@ import _funciones as fn#### funciones personalizadas, carga de imágenes
 ##### ver ejemplo de imágenes cargadas ######
 #############################################
 
-img1=cv2.imread('C:\\Users\\pablo\\Analitica 3\\CasoSalud\\Alzheimer_Dataset\\test\\MildDemented\\26 (19).jpg')
-img2 = cv2.imread('C:\\Users\\pablo\\Analitica 3\\CasoSalud\\Alzheimer_Dataset\\test\\ModerateDemented\\27 (2).jpg')
+img1=cv2.imread('C:\\Users\\yulia\\Desktop\\EntregaSalud\\CasoSalud\\Alzheimer_Dataset\\test\\MildDemented\\26 (19).jpg')
+img2 = cv2.imread('C:\\Users\\yulia\\Desktop\\EntregaSalud\\CasoSalud\\Alzheimer_Dataset\\test\\ModerateDemented\\27 (2).jpg')
 
 ############################################
 ##### ver ejemplo de imágenes cargadas ######
