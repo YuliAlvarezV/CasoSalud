@@ -137,7 +137,7 @@ def build_model(hp):
 tuner = kt.RandomSearch(
     hypermodel=build_model,
     hyperparameters=hp,
-    tune_new_entries=False, ## solo evalúe los hiperparámetros configurados
+    tune_new_entries=True, ## solo evalúe los hiperparámetros configurados
     objective=kt.Objective("val_AUC", direction="max"),
     max_trials=10,
     overwrite=True,
