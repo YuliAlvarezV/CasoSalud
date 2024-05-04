@@ -11,6 +11,7 @@ import cv2 ### para leer imagenes jpeg
 
 from matplotlib import pyplot as plt #
 from sklearn.preprocessing import label_binarize
+from tensorflow.keras.utils import to_categorical
 
 
 ### cargar bases_preprocesadas ####
@@ -23,8 +24,8 @@ y_test = joblib.load('salidas\\y_test.pkl')
 #### Escalar ######################
 x_train=x_train.astype('float32') ## para poder escalarlo
 x_test=x_test.astype('float32') ## para poder escalarlo
-x_train /=255 ### escalaro para que quede entre 0 y 1
-x_test /=255
+x_train /=254 ### escalaro para que quede entre 0 y 1
+x_test /=254
 
 ###### verificar tamaños
 
@@ -70,23 +71,19 @@ fc_model=tf.keras.models.Sequential([
     tf.keras.layers.Flatten(input_shape=x_train.shape[1:]),
     tf.keras.layers.Dense(128, activation='relu'),
     tf.keras.layers.Dense(64, activation='relu'),
-    tf.keras.layers.Dense(1, activation='sigmoid')
+    tf.keras.layers.Dense(4, activation='softmax')
 ])
 
 ##### configura el optimizador y la función para optimizar ##############
 
-fc_model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy','AUC', 'Recall', 'Precision', 'f1_score'])
+fc_model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['AUC', 'f1_score'])
 
 #####Entrenar el modelo usando el optimizador y arquitectura definidas #########
 
-fc_model.fit(x_train, y_train, batch_size=100, epochs=10, validation_data=(x_test, y_test))
+y_train_one_hot = to_categorical(y_train, 4)
+y_test_one_hot = to_categorical(y_test, 4)
+fc_model.fit(x_train, y_train_one_hot, batch_size=100, epochs=10, validation_data=(x_test, y_test_one_hot))
 
 #########Evaluar el modelo ####################
 
-test_results = fc_model.evaluate(x_test, y_test, verbose=2)
-
-# Mostrar los resultados
-print("Test AUC:", test_results[2])
-print("Test Recall:", test_results[3])
-print("Test Precision:", test_results[4])
-print("Test F1-score:", test_results[5])
+test_results = fc_model.evaluate(x_test, y_test_one_hot, verbose=2)
