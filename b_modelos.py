@@ -32,6 +32,7 @@ x_test /=254
 x_train.shape
 x_test.shape
 
+
 np.product(x_train[1].shape) ## cantidad de variables por imagen
 
 np.unique(y_train, return_counts=True)
@@ -58,10 +59,10 @@ pred_test=rf.predict(x_test2)
 print(metrics.classification_report(y_test, pred_test))
 
 # Convertir las etiquetas de clase en un formato binario
-y_score_binary = label_binarize(pred_train, classes=[0, 1, 2, 3]) 
-metrics.roc_auc_score(y_train, y_score_binary, average='macro', multi_class='ovr')
-y_score_binaryt = label_binarize(pred_test, classes=[0, 1, 2, 3]) 
-metrics.roc_auc_score(y_test, y_score_binaryt, average='macro', multi_class='ovr')
+#y_score_binary = label_binarize(pred_train, classes=[0, 1]) 
+metrics.roc_auc_score(y_train, pred_train, average='macro', multi_class='ovr')
+#y_score_binaryt = label_binarize(pred_test, classes=[0, 1]) 
+metrics.roc_auc_score(y_test, pred_test, average='macro', multi_class='ovr')
 
 ############################################################
 ################ Probar modelos de redes neuronales #########
@@ -71,19 +72,19 @@ fc_model=tf.keras.models.Sequential([
     tf.keras.layers.Flatten(input_shape=x_train.shape[1:]),
     tf.keras.layers.Dense(128, activation='relu'),
     tf.keras.layers.Dense(64, activation='relu'),
-    tf.keras.layers.Dense(4, activation='softmax')
+    tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 
 ##### configura el optimizador y la función para optimizar ##############
 
-fc_model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['AUC', 'f1_score'])
+fc_model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['AUC', 'f1_score'])
 
 #####Entrenar el modelo usando el optimizador y arquitectura definidas #########
 
-y_train_one_hot = to_categorical(y_train, 4)
-y_test_one_hot = to_categorical(y_test, 4)
-fc_model.fit(x_train, y_train_one_hot, batch_size=100, epochs=10, validation_data=(x_test, y_test_one_hot))
+#y_train_one_hot = to_categorical(y_train, 3)
+#y_test_one_hot = to_categorical(y_test, 3)
+fc_model.fit(x_train, y_train, batch_size=100, epochs=10, validation_data=(x_test, y_test))
 
 #########Evaluar el modelo ####################
 
-test_results = fc_model.evaluate(x_test, y_test_one_hot, verbose=2)
+test_results = fc_model.evaluate(x_test, y_test, verbose=2)

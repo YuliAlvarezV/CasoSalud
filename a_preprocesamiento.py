@@ -54,7 +54,7 @@ np.prod(img2_r.shape)
 
 
 width = 100 #tamaño para reescalar imágen
-num_classes = 4 #clases variable respuesta
+num_classes = 2 #clases variable respuesta
 trainpath = 'Alzheimer_Dataset/train/'
 testpath = 'Alzheimer_Dataset/test/'
 

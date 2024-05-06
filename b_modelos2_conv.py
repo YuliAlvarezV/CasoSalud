@@ -5,9 +5,6 @@ import joblib ### para cargar array
 import tensorflow as tf
 from sklearn import metrics ### para analizar modelo
 import pandas as pd
-
-####instalar paquete !pip install keras-tuner
-
 import keras_tuner as kt
 from tensorflow.keras.utils import to_categorical
 
@@ -49,18 +46,19 @@ cnn_model = tf.keras.Sequential([
     tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
     tf.keras.layers.Flatten(),
     tf.keras.layers.Dense(64, activation='relu'),
-    tf.keras.layers.Dense(4, activation='softmax')
+    tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 
 # Compilacion del modelo con categorical_crossentropy loss y Adam optimizer
-cnn_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['AUC', 'f1_score'])
+cnn_model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['AUC', 'f1_score'])
 
 # entrenamiento del modelo y primeras metricas de desempeño
-y_train_one_hot = to_categorical(y_train, 4)
-y_test_one_hot = to_categorical(y_test, 4)
-cnn_model.fit(x_train, y_train_one_hot, batch_size=100, epochs=10, validation_data=(x_test, y_test_one_hot))
+#y_train_one_hot = to_categorical(y_train, 3)
+#y_test_one_hot = to_categorical(y_test, 3)
+cnn_model.fit(x_train, y_train, batch_size=100, epochs=10, validation_data=(x_test, y_test))
 
 cnn_model.summary()
+test_results = cnn_model.evaluate(x_test, y_test, verbose=2)
 
 #######probar una red con regulzarización L2
 reg_strength = 0.001
@@ -79,14 +77,14 @@ cnn_model2 = tf.keras.Sequential([
     tf.keras.layers.Flatten(),
     tf.keras.layers.Dense(64, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(reg_strength)),
     tf.keras.layers.Dropout(dropout_rate),
-    tf.keras.layers.Dense(4, activation='softmax')
+    tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 
 # Compile the model with binary cross-entropy loss and Adam optimizer
-cnn_model2.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['AUC', 'f1_score'])
+cnn_model2.compile(optimizer='adam', loss='binary_crossentropy', metrics=['AUC', 'f1_score'])
 
 # Train the model for 10 epochs
-cnn_model2.fit(x_train, y_train_one_hot, batch_size=100, epochs=10, validation_data=(x_test, y_test_one_hot))
+cnn_model2.fit(x_train, y_train, batch_size=100, epochs=10, validation_data=(x_test, y_test))
 
 #####################################################
 ###### afinar hiperparameter ########################
@@ -97,7 +95,7 @@ hp = kt.HyperParameters()
 
 def build_model(hp):
     
-    dropout_rate=hp.Float('DO', min_value=0.3, max_value= 0.6, step=0.05)
+    dropout_rate=hp.Float('DO', min_value=0.1, max_value= 0.5, step=0.05)
     reg_strength = hp.Float("rs", min_value=0.0005, max_value=0.001, step=0.0001)
     optimizer = hp.Choice('optimizer', ['adam', 'sgd', 'rmsprop']) ### en el contexto no se debería afinar
     activation_fn = hp.Choice('activation', ['tanh', 'leaky_relu', 'relu'])  # la función de activación
@@ -115,7 +113,7 @@ def build_model(hp):
         tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(64, activation=activation_fn, kernel_regularizer=tf.keras.regularizers.l2(reg_strength)),
         tf.keras.layers.Dropout(dropout_rate),
-        tf.keras.layers.Dense(4, activation='softmax')
+        tf.keras.layers.Dense(1, activation='sigmoid')
     ])
     
   
@@ -128,7 +126,7 @@ def build_model(hp):
         opt = tf.keras.optimizers.RMSprop(learning_rate=0.001)
    
     model.compile(
-        optimizer=opt, loss="categorical_crossentropy", metrics=['AUC', 'f1_score'],
+        optimizer=opt, loss="binary_crossentropy", metrics=['AUC', 'f1_score'],
     )
     
     
@@ -137,7 +135,7 @@ def build_model(hp):
 tuner = kt.RandomSearch(
     hypermodel=build_model,
     hyperparameters=hp,
-    tune_new_entries=True, ## solo evalúe los hiperparámetros configurados
+    tune_new_entries=True,
     objective=kt.Objective("val_AUC", direction="max"),
     max_trials=10,
     overwrite=True,
@@ -145,19 +143,15 @@ tuner = kt.RandomSearch(
     project_name="helloworld", 
 )
 
-tuner.search(x_train, y_train_one_hot, epochs=5, validation_data=(x_test, y_test_one_hot), batch_size=100)
+tuner.search(x_train, y_train, epochs=5, validation_data=(x_test, y_test), batch_size=100)
 
 fc_best_model = tuner.get_best_models(num_models=1)[0]
 tuner.results_summary()
 fc_best_model.summary()
 
-train_results = fc_best_model.evaluate(x_train, y_train_one_hot, verbose=2)
-test_results = fc_best_model.evaluate(x_test, y_test_one_hot, verbose=2)
+train_results = fc_best_model.evaluate(x_train, y_train, verbose=2)
+test_results = fc_best_model.evaluate(x_test, y_test, verbose=2)
+pred_test=(fc_best_model.predict(x_test)>=0.50).astype('int')
 
 #################### Mejor redes ##############
 fc_best_model.save('salidas\\fc_model.h5')
-cnn_model.save('salidas\\cnn_model.h5')
-
-
-cargar_modelo=tf.keras.models.load_model('salidas\\cnn_model.h5')
-cargar_modelo.summary()
