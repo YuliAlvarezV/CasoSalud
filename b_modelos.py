@@ -77,7 +77,11 @@ fc_model=tf.keras.models.Sequential([
 
 ##### configura el optimizador y la función para optimizar ##############
 
+<<<<<<< HEAD
 fc_model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['AUC', 'f1_score', 'accuracy'])
+=======
+fc_model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['AUC', 'f1_score'])
+>>>>>>> e21224ab6075ced96d5d2f948a106cfa12d8a105
 
 #####Entrenar el modelo usando el optimizador y arquitectura definidas #########
 

@@ -29,7 +29,7 @@ def img2data(path, width=100):
                 if l == 'VeryMildDemented':  ### verificar en qué carpeta está para asignar el label
                     labels.append([1])
                 if l == 'MildDemented':
-                    labels.append([2])
+                    labels.append([1])
                 elif l == 'ModerateDemented':
-                    labels.append([3])
+                    labels.append([1])
     return rawImgs, labels
