@@ -35,13 +35,13 @@ np.prod(img1.shape) ### mas de 100 mil observaciones cada imágen
 #### dado que se necesitarían muchas observaciones (imágenes para entrenar)
 #### un modelo con tantas observaciones y no tenemos, vamos a reescalar las imágenes
 
-img1_r = cv2.resize(img1 ,(100,100))
+img1_r = cv2.resize(img1 ,(150,150))
 plt.imshow(img1_r)
 plt.title('MildDemented')
 plt.show()
 np.prod(img1_r.shape)
 
-img2_r = cv2.resize(img2 ,(100,100))
+img2_r = cv2.resize(img2 ,(70,70))
 plt.imshow(img2_r)
 plt.title('ModerateDemented')
 plt.show()
@@ -54,7 +54,7 @@ np.prod(img2_r.shape)
 
 
 width = 100 #tamaño para reescalar imágen
-num_classes = 4 #clases variable respuesta
+num_classes = 2 #clases variable respuesta
 trainpath = 'Alzheimer_Dataset/train/'
 testpath = 'Alzheimer_Dataset/test/'
 
