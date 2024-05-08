@@ -50,11 +50,7 @@ cnn_model = tf.keras.Sequential([
 ])
 
 # Compilacion del modelo con categorical_crossentropy loss y Adam optimizer
-<<<<<<< HEAD
 cnn_model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['AUC', 'f1_score', 'accuracy'])
-=======
-cnn_model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['AUC', 'f1_score'])
->>>>>>> e21224ab6075ced96d5d2f948a106cfa12d8a105
 
 # entrenamiento del modelo y primeras metricas de desempeño
 #y_train_one_hot = to_categorical(y_train, 3)
@@ -85,11 +81,7 @@ cnn_model2 = tf.keras.Sequential([
 ])
 
 # Compile the model with binary cross-entropy loss and Adam optimizer
-<<<<<<< HEAD
 cnn_model2.compile(optimizer='adam', loss='binary_crossentropy', metrics=['AUC', 'f1_score', 'Recall', 'accuracy'])
-=======
-cnn_model2.compile(optimizer='adam', loss='binary_crossentropy', metrics=['AUC', 'f1_score'])
->>>>>>> e21224ab6075ced96d5d2f948a106cfa12d8a105
 
 # Train the model for 10 epochs
 cnn_model2.fit(x_train, y_train, batch_size=100, epochs=10, validation_data=(x_test, y_test))
@@ -103,13 +95,8 @@ hp = kt.HyperParameters()
 
 def build_model(hp):
     
-<<<<<<< HEAD
     dropout_rate=hp.Float('DO', min_value=0.3, max_value= 0.5, step=0.05)
     reg_strength = hp.Float("rs", min_value=0.0006, max_value=0.001, step=0.0001)
-=======
-    dropout_rate=hp.Float('DO', min_value=0.1, max_value= 0.5, step=0.05)
-    reg_strength = hp.Float("rs", min_value=0.0005, max_value=0.001, step=0.0001)
->>>>>>> e21224ab6075ced96d5d2f948a106cfa12d8a105
     optimizer = hp.Choice('optimizer', ['adam', 'sgd', 'rmsprop']) ### en el contexto no se debería afinar
     activation_fn = hp.Choice('activation', ['tanh', 'leaky_relu', 'relu'])  # la función de activación
     ####hp.Int
@@ -139,11 +126,7 @@ def build_model(hp):
         opt = tf.keras.optimizers.RMSprop(learning_rate=0.001)
    
     model.compile(
-<<<<<<< HEAD
         optimizer=opt, loss="binary_crossentropy", metrics=['AUC', 'f1_score', 'Recall', 'accuracy'],
-=======
-        optimizer=opt, loss="binary_crossentropy", metrics=['AUC', 'f1_score'],
->>>>>>> e21224ab6075ced96d5d2f948a106cfa12d8a105
     )
     
     
@@ -153,11 +136,7 @@ tuner = kt.RandomSearch(
     hypermodel=build_model,
     hyperparameters=hp,
     tune_new_entries=True,
-<<<<<<< HEAD
     objective=kt.Objective("val_accuracy", direction="max"),
-=======
-    objective=kt.Objective("val_AUC", direction="max"),
->>>>>>> e21224ab6075ced96d5d2f948a106cfa12d8a105
     max_trials=10,
     overwrite=True,
     directory="my_dir",
@@ -172,10 +151,6 @@ fc_best_model.summary()
 
 train_results = fc_best_model.evaluate(x_train, y_train, verbose=2)
 test_results = fc_best_model.evaluate(x_test, y_test, verbose=2)
-<<<<<<< HEAD
-=======
-pred_test=(fc_best_model.predict(x_test)>=0.50).astype('int')
->>>>>>> e21224ab6075ced96d5d2f948a106cfa12d8a105
 
 #################### Mejor redes ##############
 fc_best_model.save('salidas\\fc_model.h5')

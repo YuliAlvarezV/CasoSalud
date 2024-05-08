@@ -78,7 +78,7 @@ y_train.shape
 
 
 x_test.shape
-y_test.shape
+y_test.shapeL
 
 ####### salidas del preprocesamiento bases listas ######
 
